@@ -1,0 +1,8 @@
+DEVELOPER README
+(KEEP UPDATING AS THE BACKEND GETS BIGGER)
+
+INSTALL FLASK:
+sudo pip install flask
+
+RUN:
+python main.py
