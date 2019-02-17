@@ -6,7 +6,7 @@ app = Flask(__name__)
 def adduser():
     if request.method == 'POST':
         data = request.get_json()
-        return jsonify({"status" : "SUCCESS"}), 200, {'Content-Type': 'application/json; charset=utf-8'}
+        return jsonify(data)
 
 if __name__ == "__main__":
     app.run()
