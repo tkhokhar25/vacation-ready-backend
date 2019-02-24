@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from connect_to_database import get_database_connection
 from interest_sets import *
 
 app = Flask(__name__)
@@ -14,7 +13,8 @@ def adduser():
 def set_interest_set():
         if request.method == 'POST':
                 data = request.get_json()
-                return set_interest(data)
+
+                return jsonify(set_interest(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 if __name__ == "__main__":
     app.run()
