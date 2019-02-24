@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from add_user import *
 from interest_sets import *
+from trip_generator import generate_trip
 
 app = Flask(__name__)
 
@@ -38,6 +39,14 @@ def update_interest_set():
                 data = request.get_json()
 
                 return jsonify(update_interest(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
+@app.route('/generate-trip', methods=['GET', 'POST'])
+def generate_trip_endpoint():
+        if request.method == 'POST':
+                data = request.get_json()
+                generate_trip(data)
+
+                return jsonify({"STATUS" : "SUCCESS"}), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 if __name__ == "__main__":
     app.run()

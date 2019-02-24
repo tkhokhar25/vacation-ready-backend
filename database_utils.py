@@ -34,8 +34,8 @@ def display_data_as_json(cur, result):
 def insert_format(table_name, keys, values, to_return):
     return "INSERT INTO {} {} VALUES {} RETURNING {}".format(table_name, keys, values, to_return)
 
-def retrieve_format(table_name, interest_set_id):
-    return "SELECT * FROM {} WHERE interest_set_id = {}".format(table_name, interest_set_id)
+def retrieve_format(table_name, interest_set_id, values):
+    return "SELECT {} FROM {} WHERE interest_set_id = {}".format(values, table_name, interest_set_id)
 
 def update_format(table_name, keys, values, entry_id_name, entry_id_value):
     return "UPDATE {} SET {} = {} WHERE {} = {}".format(table_name, keys, values, entry_id_name, entry_id_value)
@@ -85,7 +85,7 @@ def retrieve_from_database(table_name, interest_set_id):
     cur = connection.cursor()
 
     try:
-        cur.execute(retrieve_format(table_name, interest_set_id))
+        cur.execute(retrieve_format(table_name, interest_set_id, "*"))
         
         return display_data_as_json(cur, cur.fetchall())
     except:
@@ -105,3 +105,15 @@ def update_in_database(table_name, json_data, entry_id_name, entry_id_value):
     except:
 
         return {"STATUS" : "FAILURE"}
+
+def retrieve_from_database_without_json(table_name, interest_set_id, value):
+    connection = get_database_connection()
+    cur = connection.cursor()
+
+    try:
+        cur.execute(retrieve_format(table_name, interest_set_id, value))
+        
+        return cur.fetchall()
+    except:
+
+        return -1
