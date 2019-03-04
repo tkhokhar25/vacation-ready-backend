@@ -49,4 +49,4 @@ def generate_trip_endpoint():
                 return jsonify({"STATUS" : "SUCCESS"}), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=80)
