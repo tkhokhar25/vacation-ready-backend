@@ -3,9 +3,10 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from flask import jsonify
 import json
 
-kDATABASE_NAME = 'vacationready'
-kUSER = 'tushar'
-kPASSWORD = 'password'
+kDATABASE_NAME = 'dbqvqb417h75ok'
+kUSER = 'syellmnssqszzw'
+kPASSWORD = 'fc2a87a6d11f20b99463426f94d11aa60b21817f803402c2e70ca5904403d6ab'
+kHOST = 'ec2-50-17-193-83.compute-1.amazonaws.com'
 
 def display_data_as_json(cur, result):
     response = '{ "result": ['
@@ -41,7 +42,7 @@ def update_format(table_name, keys, values, entry_id_name, entry_id_value):
     return "UPDATE {} SET {} = {} WHERE {} = {}".format(table_name, keys, values, entry_id_name, entry_id_value)
 
 def get_database_connection():
-    connection = psycopg2.connect(dbname = kDATABASE_NAME, user = kUSER, password = kPASSWORD, host = 'localhost')
+    connection = psycopg2.connect(dbname = kDATABASE_NAME, user = kUSER, password = kPASSWORD, host = kHOST)
     connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
     return connection
