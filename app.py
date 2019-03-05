@@ -4,7 +4,7 @@ from interest_sets import *
 
 app = Flask(__name__)
 
-@app.route('/add-user')
+@app.route('/')
 def home_page():
         return "HELLO WORLD"
 
