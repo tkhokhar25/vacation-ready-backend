@@ -4,6 +4,10 @@ from interest_sets import *
 
 app = Flask(__name__)
 
+@app.route('/add-user')
+def home_page():
+        return "HELLO WORLD"
+
 @app.route('/add-user', methods=['GET', 'POST'])
 def adduser():
     if request.method == 'POST':
