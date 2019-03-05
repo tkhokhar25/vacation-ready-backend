@@ -1,12 +1,12 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from add_user import *
 from interest_sets import *
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home_page():
-        return "HELLO WORLD"
+        return render_template('index.html')
 
 @app.route('/add-user', methods=['GET', 'POST'])
 def adduser():
