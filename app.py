@@ -3,7 +3,7 @@ from add_user import *
 from interest_sets import *
 from trip_generator import generate_trip
 from trip_info import *
-import os
+import os       
 
 app = Flask(__name__)
 
@@ -62,5 +62,4 @@ def set_trip_set():
                 return jsonify(set_trip_info(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 if __name__ == "__main__":
-        app.secret_key = os.urandom(24)
         app.run()
