@@ -62,4 +62,4 @@ def set_trip_set():
                 return jsonify(set_trip_info(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 if __name__ == "__main__":
-        app.run(debug=True)
+        app.run()
