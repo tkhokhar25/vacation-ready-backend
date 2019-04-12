@@ -20,35 +20,43 @@ def get_price_level(meal_budget):
 
 def create_json_entry_for_restaurant(restaurant_entry, cuisine):
     restaurant_json_formatted_entry = {}
-    restaurant_id = restaurant_entry['place_id']
-    restaurant_json_formatted_entry[restaurant_id] = {}
-    restaurant_json_formatted_entry[restaurant_id]['price_level'] = restaurant_entry['price_level']
-    restaurant_json_formatted_entry[restaurant_id]['price_level'] = restaurant_entry['price_level']
-    restaurant_json_formatted_entry[restaurant_id]['name'] = restaurant_entry['name']
-    restaurant_json_formatted_entry[restaurant_id]['cuisine'] = cuisine
+    restaurant_json_formatted_entry['place_id'] = restaurant_entry['place_id']
+    restaurant_json_formatted_entry['price_level'] = restaurant_entry['price_level']
+    restaurant_json_formatted_entry['name'] = restaurant_entry['name']
+    restaurant_json_formatted_entry['cuisine'] = cuisine
     restaurant_maps_link = restaurant_entry['photos'][0]['html_attributions'][0].split('"')[1].split('"')[0]
-    restaurant_json_formatted_entry[restaurant_id]['maps_link'] = restaurant_maps_link
+    restaurant_json_formatted_entry['maps_link'] = restaurant_maps_link
     
     return restaurant_json_formatted_entry
 
 def filter_restaurants(restaurant_data, cuisine):
-    # pprint(restaurant_data)
-    id_to_rating = {}
     resturant_list = []
 
     for restaurant in restaurant_data['results']:
-        id_to_rating[restaurant['place_id']] = restaurant['rating']
         resturant_list.append(create_json_entry_for_restaurant(restaurant, cuisine))
     
     return resturant_list
 
+def create_json_entry_for_attraction(attraction_entry):
+    attraction_json_formatted_entry = {}
+    attraction_id = attraction_entry['place_id']
+    attraction_json_formatted_entry[attraction_id] = {}
+    attraction_json_formatted_entry[attraction_id]['name'] = attraction_entry['name']
+    try:
+        attraction_maps_link = attraction_entry['photos'][0]['html_attributions'][0].split('"')[1].split('"')[0]
+        attraction_json_formatted_entry[attraction_id]['maps_link'] = attraction_maps_link
+    except:
+        pass
+
+    return attraction_json_formatted_entry
+
 def filter_attractions(attractions_data):
-    id_to_rating = {}
+    attractions_list = []
 
     for attraction in attractions_data['results']:
-        id_to_rating[attraction['place_id']] = attraction['rating']
+        attractions_list.append(create_json_entry_for_attraction(attraction))
 
-    return sorted(id_to_rating.items(), key=lambda x: x[1])
+    return attractions_list
 
 def format_restaurant_request_url(query_type, query_city, min_price, max_price):
     return kRESTAURANT_QUERY_URL.format(query_type, query_city, kAPI_KEY, min_price, max_price)
@@ -65,7 +73,7 @@ def get_place_name_from_id(place_id):
 
     return place_name
 
-def get_restaurants(pricing, interest_set_id):
+def get_restaurants(interest_set_id):
     cuisines = retrieve_from_database_without_json(kINTEREST_SET_TABLE, interest_set_id, "cuisines")
 
     meal_budget = retrieve_from_database_without_json(kTRIP_INFO_TABLE, interest_set_id, "budget_per_meal")[0][0]
@@ -85,17 +93,25 @@ def get_restaurants(pricing, interest_set_id):
 
     return suggested_restaurants
 
-def get_attractions(pricing, interest_set_id):
+def get_attractions(interest_set_id):
     attractions = retrieve_from_database_without_json(kINTEREST_SET_TABLE, interest_set_id, "attractions")
+    place_id = retrieve_from_database_without_json(kTRIP_INFO_TABLE, interest_set_id, "place_id")[0][0]
+    place_name = get_place_name_from_id(place_id)
 
     suggested_attractions = []
 
     for i in range (0, len(attractions[0][0])):
-        request_url = format_attraction_request_url(attractions[0][0][i] + " attractions", "Chicago")
+        request_url = format_attraction_request_url(attractions[0][0][i] + " attractions", place_name)
         attractions_data = requests.get(request_url).json()
-        suggested_attractions.append(filter_attractions(attractions_data))
+        pprint(attractions_data)
+        suggested_attractions += (filter_attractions(attractions_data))
 
     return suggested_attractions
 
 def generate_trip(data):
-    return get_restaurants(2, data["interest_set_id"])
+    trip_places = {}
+
+    trip_places["restaurants"] = get_restaurants(data["interest_set_id"])
+    # trip_places["attractions"] = get_attractions(data["interest_set_id"])
+
+    return trip_places
