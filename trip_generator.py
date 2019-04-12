@@ -26,6 +26,8 @@ def create_json_entry_for_restaurant(restaurant_entry, cuisine):
     restaurant_json_formatted_entry['cuisine'] = cuisine
     restaurant_maps_link = restaurant_entry['photos'][0]['html_attributions'][0].split('"')[1].split('"')[0]
     restaurant_json_formatted_entry['maps_link'] = restaurant_maps_link
+    restaurant_json_formatted_entry['lat'] = restaurant_entry['geometry']['location']['lat']
+    restaurant_json_formatted_entry['lng'] = restaurant_entry['geometry']['location']['lng']
     
     return restaurant_json_formatted_entry
 
@@ -45,6 +47,8 @@ def create_json_entry_for_attraction(attraction_entry):
     attraction_json_formatted_entry = {}
     attraction_json_formatted_entry['place_id'] = attraction_entry['place_id']
     attraction_json_formatted_entry['name'] = attraction_entry['name']
+    attraction_json_formatted_entry['lat'] = attraction_entry['geometry']['location']['lat']
+    attraction_json_formatted_entry['lng'] = attraction_entry['geometry']['location']['lng']
     try:
         attraction_maps_link = attraction_entry['photos'][0]['html_attributions'][0].split('"')[1].split('"')[0]
         attraction_json_formatted_entry['maps_link'] = attraction_maps_link
@@ -58,7 +62,7 @@ def filter_attractions(attractions_data, all_attractions_set):
 
     for attraction in attractions_data['results']:
         attraction_entry = create_json_entry_for_attraction(attraction)
-        
+
         if attraction_entry['place_id'] not in all_attractions_set:
             attractions_list.append(attraction_entry)
             all_attractions_set.add(attraction_entry['place_id'])
