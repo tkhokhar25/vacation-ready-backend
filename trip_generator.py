@@ -5,6 +5,7 @@ from table_names import *
 
 kRESTAURANT_QUERY_URL = "https://maps.googleapis.com/maps/api/place/textsearch/json?query={}+in+{}&key={}&minprice={}&maxprice={}"
 kATTRACTION_QUERY_URL = "https://maps.googleapis.com/maps/api/place/textsearch/json?query={}+in+{}&key={}"
+kPLACE_NAME_QUERY_URL = "https://maps.googleapis.com/maps/api/place/details/json?placeid={}&fields=formatted_address&key={}"
 kAPI_KEY = "AIzaSyABkkdZcbLVgXidTnfII6QHDVi4MT_9Xmg"
 
 def get_price_level(meal_budget):
@@ -55,9 +56,22 @@ def format_restaurant_request_url(query_type, query_city, min_price, max_price):
 def format_attraction_request_url(query_type, query_city):
     return kATTRACTION_QUERY_URL.format(query_type, query_city, kAPI_KEY)
 
+def format_place_name_query_url(place_id):
+    return kPLACE_NAME_QUERY_URL.format(place_id, kAPI_KEY)
+
+def get_place_name_from_id(place_id):
+    request_url = format_place_name_query_url(place_id)
+    place_name = requests.get(request_url).json()['result']['formatted_address']
+
+    return place_name
+
 def get_restaurants(pricing, interest_set_id):
     cuisines = retrieve_from_database_without_json(kINTEREST_SET_TABLE, interest_set_id, "cuisines")
+
     meal_budget = retrieve_from_database_without_json(kTRIP_INFO_TABLE, interest_set_id, "budget_per_meal")[0][0]
+    place_id = retrieve_from_database_without_json(kTRIP_INFO_TABLE, interest_set_id, "place_id")[0][0]
+    place_name = get_place_name_from_id(place_id)
+
     price_level = get_price_level(meal_budget)
 
     meal_times = ["breakfast", "lunch", "dinner"]
@@ -65,7 +79,7 @@ def get_restaurants(pricing, interest_set_id):
 
     for i in range (0, len(meal_times)):
         for j in range (0, len(cuisines[0][0])):
-            request_url = format_restaurant_request_url(cuisines[0][0][j] + " " + meal_times[i] + " restaurants", "Chicago", price_level - 1, price_level)
+            request_url = format_restaurant_request_url(cuisines[0][0][j] + " " + meal_times[i] + " restaurants", place_name, price_level - 1, price_level)
             restaurant_data = requests.get(request_url).json()
             suggested_restaurants[meal_times[i]] += (filter_restaurants(restaurant_data, cuisines[0][0][j]))
 
