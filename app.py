@@ -33,11 +33,18 @@ def set_interest_set():
                 return jsonify(set_interest(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 @app.route('/get-interest-set', methods=['GET', 'POST'])
-def get_interest_set():
+def get_all_interest_sets():
         if request.method == 'POST':
                 data = request.get_json()
 
                 return jsonify(get_interest(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
+@app.route('/get-all-interest-sets', methods=['GET', 'POST'])
+def get_interest_set():
+        if request.method == 'POST':
+                data = request.get_json()
+
+                return jsonify(get_all_interest_sets(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 @app.route('/update-interest-set', methods=['GET', 'POST'])
 def update_interest_set():
@@ -50,9 +57,8 @@ def update_interest_set():
 def generate_trip_endpoint():
         if request.method == 'POST':
                 data = request.get_json()
-                generate_trip(data)
 
-                return jsonify({"STATUS" : "SUCCESS"}), 200, {'Content-Type': 'application/json; charset=utf-8'}
+                return jsonify(generate_trip(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 @app.route('/set-trip-info', methods=['GET', 'POST'])
 def set_trip_set():

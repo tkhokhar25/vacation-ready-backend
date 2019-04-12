@@ -12,3 +12,6 @@ def update_interest(json_data):
         interest_set_id = json_data["interest_set_id"]
 
         return update_in_database(kINTEREST_SET_TABLE, json_data, "interest_set_id", interest_set_id)
+
+def get_all_interest_sets(json_data):
+    all_interest_set_ids = retrieve_from_database(kINTEREST_SET_TABLE, json_data["interest_set_id"])
