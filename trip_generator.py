@@ -29,11 +29,15 @@ def create_json_entry_for_restaurant(restaurant_entry, cuisine):
     
     return restaurant_json_formatted_entry
 
-def filter_restaurants(restaurant_data, cuisine):
+def filter_restaurants(restaurant_data, cuisine, all_restaurants_set):
     resturant_list = []
 
     for restaurant in restaurant_data['results']:
-        resturant_list.append(create_json_entry_for_restaurant(restaurant, cuisine))
+        resturant_entry = create_json_entry_for_restaurant(restaurant, cuisine)
+
+        if resturant_entry['place_id'] not in all_restaurants_set:
+            resturant_list.append(resturant_entry)
+            all_restaurants_set.add(resturant_entry['place_id'])
     
     return resturant_list
 
@@ -49,11 +53,15 @@ def create_json_entry_for_attraction(attraction_entry):
 
     return attraction_json_formatted_entry
 
-def filter_attractions(attractions_data):
+def filter_attractions(attractions_data, all_attractions_set):
     attractions_list = []
 
     for attraction in attractions_data['results']:
-        attractions_list.append(create_json_entry_for_attraction(attraction))
+        attraction_entry = create_json_entry_for_attraction(attraction)
+        
+        if attraction_entry['place_id'] not in all_attractions_set:
+            attractions_list.append(attraction_entry)
+            all_attractions_set.add(attraction_entry['place_id'])
 
     return attractions_list
 
@@ -84,11 +92,13 @@ def get_restaurants(interest_set_id):
     meal_times = ["breakfast", "lunch", "dinner"]
     suggested_restaurants = {meal_times[0] : [], meal_times[1] : [], meal_times[2] : []}
 
+    all_restaurants_set = set()
+
     for i in range (0, len(meal_times)):
         for j in range (0, len(cuisines[0][0])):
             request_url = format_restaurant_request_url(cuisines[0][0][j] + " " + meal_times[i] + " restaurants", place_name, price_level - 1, price_level)
             restaurant_data = requests.get(request_url).json()
-            suggested_restaurants[meal_times[i]] += (filter_restaurants(restaurant_data, cuisines[0][0][j]))
+            suggested_restaurants[meal_times[i]] += (filter_restaurants(restaurant_data, cuisines[0][0][j], all_restaurants_set))
 
     return suggested_restaurants
 
@@ -99,11 +109,13 @@ def get_attractions(interest_set_id):
 
     suggested_attractions = {}
 
+    all_attractions_set = set()
+
     for i in range (0, len(attractions[0][0])):
         request_url = format_attraction_request_url(attractions[0][0][i] + " attractions", place_name)
         attractions_data = requests.get(request_url).json()
 
-        suggested_attractions[attractions[0][0][i]] = (filter_attractions(attractions_data))
+        suggested_attractions[attractions[0][0][i]] = (filter_attractions(attractions_data, all_attractions_set))
 
     return suggested_attractions
 
