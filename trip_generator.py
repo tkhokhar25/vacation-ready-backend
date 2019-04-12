@@ -39,14 +39,13 @@ def filter_restaurants(restaurant_data, cuisine):
 
 def create_json_entry_for_attraction(attraction_entry):
     attraction_json_formatted_entry = {}
-    attraction_id = attraction_entry['place_id']
-    attraction_json_formatted_entry[attraction_id] = {}
-    attraction_json_formatted_entry[attraction_id]['name'] = attraction_entry['name']
+    attraction_json_formatted_entry['place_id'] = attraction_entry['place_id']
+    attraction_json_formatted_entry['name'] = attraction_entry['name']
     try:
         attraction_maps_link = attraction_entry['photos'][0]['html_attributions'][0].split('"')[1].split('"')[0]
-        attraction_json_formatted_entry[attraction_id]['maps_link'] = attraction_maps_link
+        attraction_json_formatted_entry['maps_link'] = attraction_maps_link
     except:
-        pass
+        attraction_json_formatted_entry['maps_link'] = None
 
     return attraction_json_formatted_entry
 
@@ -98,13 +97,13 @@ def get_attractions(interest_set_id):
     place_id = retrieve_from_database_without_json(kTRIP_INFO_TABLE, interest_set_id, "place_id")[0][0]
     place_name = get_place_name_from_id(place_id)
 
-    suggested_attractions = []
+    suggested_attractions = {}
 
     for i in range (0, len(attractions[0][0])):
         request_url = format_attraction_request_url(attractions[0][0][i] + " attractions", place_name)
         attractions_data = requests.get(request_url).json()
-        pprint(attractions_data)
-        suggested_attractions += (filter_attractions(attractions_data))
+
+        suggested_attractions[attractions[0][0][i]] = (filter_attractions(attractions_data))
 
     return suggested_attractions
 
@@ -112,6 +111,6 @@ def generate_trip(data):
     trip_places = {}
 
     trip_places["restaurants"] = get_restaurants(data["interest_set_id"])
-    # trip_places["attractions"] = get_attractions(data["interest_set_id"])
+    trip_places["attractions"] = get_attractions(data["interest_set_id"])
 
     return trip_places
