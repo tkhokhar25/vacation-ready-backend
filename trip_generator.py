@@ -24,8 +24,6 @@ def create_json_to_return(list_of_meal_time_dicts, meal_times):
 
     for i in range(0, len(list_of_meal_time_dicts)):
         for key in list_of_meal_time_dicts[i].keys():
-            # print(list_of_meal_time_dicts[i][key])
-            # insert_into_database(kPLACE_REVIEWS_TABLE, list_of_meal_time_dicts[i][key], "place_id")
             suggested_restaurants[meal_times[i]].append(list_of_meal_time_dicts[i][key])
 
     return suggested_restaurants
@@ -49,7 +47,7 @@ def evenly_divide_restaurants(list_of_meal_time_dicts, list_of_meal_time_sets_of
             list_of_meal_time_dicts[2][key] = list_of_meal_time_dicts[1][key]
             del list_of_meal_time_dicts[1][key]
 
-def create_json_entry_for_restaurant(restaurant_entry, cuisine):
+def create_json_entry_for_restaurant(restaurant_entry, cuisine, meal_time):
     restaurant_json_formatted_entry = {}
     restaurant_json_formatted_entry['place_id'] = restaurant_entry['place_id']
     restaurant_json_formatted_entry['price_level'] = restaurant_entry['price_level']
@@ -59,12 +57,13 @@ def create_json_entry_for_restaurant(restaurant_entry, cuisine):
     restaurant_json_formatted_entry['maps_link'] = restaurant_maps_link
     restaurant_json_formatted_entry['lat'] = restaurant_entry['geometry']['location']['lat']
     restaurant_json_formatted_entry['lng'] = restaurant_entry['geometry']['location']['lng']
+    restaurant_json_formatted_entry['type'] = meal_time
 
     return restaurant_json_formatted_entry
 
-def filter_restaurants(restaurant_data, cuisine, list_of_meal_time_dicts, curr_dict_index, unadded_restaurants_set):
+def filter_restaurants(restaurant_data, cuisine, list_of_meal_time_dicts, curr_dict_index, unadded_restaurants_set, meal_time):
     for restaurant in restaurant_data['results']:
-        resturant_entry = create_json_entry_for_restaurant(restaurant, cuisine)
+        resturant_entry = create_json_entry_for_restaurant(restaurant, cuisine, meal_time)
 
         if resturant_entry['place_id'] in list_of_meal_time_dicts[0] or resturant_entry['place_id'] in list_of_meal_time_dicts[1] or resturant_entry['place_id'] in list_of_meal_time_dicts[2]:
             if unadded_restaurants_set != None:
@@ -72,12 +71,14 @@ def filter_restaurants(restaurant_data, cuisine, list_of_meal_time_dicts, curr_d
         else:
             list_of_meal_time_dicts[curr_dict_index][resturant_entry['place_id']] = resturant_entry
 
-def create_json_entry_for_attraction(attraction_entry):
+def create_json_entry_for_attraction(attraction_entry, attraction_type):
     attraction_json_formatted_entry = {}
     attraction_json_formatted_entry['place_id'] = attraction_entry['place_id']
     attraction_json_formatted_entry['name'] = attraction_entry['name']
     attraction_json_formatted_entry['lat'] = attraction_entry['geometry']['location']['lat']
     attraction_json_formatted_entry['lng'] = attraction_entry['geometry']['location']['lng']
+    attraction_json_formatted_entry['type'] = attraction_type
+
     try:
         attraction_maps_link = attraction_entry['photos'][0]['html_attributions'][0].split('"')[1].split('"')[0]
         attraction_json_formatted_entry['maps_link'] = attraction_maps_link
@@ -86,11 +87,11 @@ def create_json_entry_for_attraction(attraction_entry):
 
     return attraction_json_formatted_entry
 
-def filter_attractions(attractions_data, all_attractions_set):
+def filter_attractions(attractions_data, all_attractions_set, attraction_type):
     attractions_list = []
 
     for attraction in attractions_data['results']:
-        attraction_entry = create_json_entry_for_attraction(attraction)
+        attraction_entry = create_json_entry_for_attraction(attraction, attraction_type)
 
         if attraction_entry['place_id'] not in all_attractions_set:
             attractions_list.append(attraction_entry)
@@ -135,7 +136,7 @@ def get_restaurants(interest_set_id):
             request_url = format_restaurant_request_url(cuisines[0][0][j] + " " + meal_times[i] + " restaurants", place_name, price_level - 1, price_level)
             restaurant_data = requests.get(request_url).json()
 
-            filter_restaurants(restaurant_data, cuisines[0][0][j], list_of_meal_time_dicts, i, list_of_meal_time_sets_of_unadded_restaurants[i])
+            filter_restaurants(restaurant_data, cuisines[0][0][j], list_of_meal_time_dicts, i, list_of_meal_time_sets_of_unadded_restaurants[i], meal_times[i])
 
     evenly_divide_restaurants(list_of_meal_time_dicts, list_of_meal_time_sets_of_unadded_restaurants)
     suggested_restaurants = create_json_to_return(list_of_meal_time_dicts, meal_times)
@@ -158,7 +159,7 @@ def get_attractions(interest_set_id):
         request_url = format_attraction_request_url(attractions[0][0][i] + " attractions", place_name)
         attractions_data = requests.get(request_url).json()
 
-        suggested_attractions[attractions[0][0][i]] = (filter_attractions(attractions_data, all_attractions_set))
+        suggested_attractions[attractions[0][0][i]] = (filter_attractions(attractions_data, all_attractions_set, attractions[0][0][i]))
 
     return suggested_attractions
 
