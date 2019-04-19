@@ -1,5 +1,5 @@
 import requests
-from database_utils import retrieve_from_database_without_json, insert_into_database
+from database_utils import retrieve_from_database_without_json, insert_into_database, retrieve_from_database
 from pprint import pprint
 from table_names import *
 from random import shuffle
@@ -19,12 +19,23 @@ def get_price_level(meal_budget):
     else:
         return 4
 
+def is_a_good_place(key):
+    result = retrieve_from_database("upvotes, downvotes", kPLACE_REVIEWS_TABLE, "place_id", "'" + key + "'")
+    if 'STATUS' in result:
+        return True
+    
+    if (result['result'][0]['downvotes'] > result['result'][0]['upvotes']):
+        return False
+    
+    return True
+
 def create_json_to_return(list_of_meal_time_dicts, meal_times):
     suggested_restaurants = {meal_times[0] : [], meal_times[1] : [], meal_times[2] : []}
 
     for i in range(0, len(list_of_meal_time_dicts)):
         for key in list_of_meal_time_dicts[i].keys():
-            suggested_restaurants[meal_times[i]].append(list_of_meal_time_dicts[i][key])
+            if is_a_good_place(key):
+                suggested_restaurants[meal_times[i]].append(list_of_meal_time_dicts[i][key])
 
     return suggested_restaurants
 

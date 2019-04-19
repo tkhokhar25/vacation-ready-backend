@@ -43,7 +43,6 @@ def update_format(table_name, keys, values, entry_id_name, entry_id_value):
     return "UPDATE {} SET {} = {} WHERE {} = {}".format(table_name, keys, values, entry_id_name, entry_id_value)
 
 def upsert_format(table_name, keys, values, conflict, column_to_update):
-    print("INSERT INTO {} {} VALUES {} ON CONFLICT ({}) DO UPDATE SET {} = {}.{} + 1".format(table_name, keys, values, conflict, column_to_update, table_name, column_to_update))
     return "INSERT INTO {} {} VALUES {} ON CONFLICT ({}) DO UPDATE SET {} = {}.{} + 1".format(table_name, keys, values, conflict, column_to_update, table_name, column_to_update)
 
 def delete_format(table_name, key, value):
