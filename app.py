@@ -33,14 +33,14 @@ def set_interest_set():
                 return jsonify(set_interest(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 @app.route('/get-interest-set', methods=['GET', 'POST'])
-def get_all_interest_sets():
+def get_interest_set():
         if request.method == 'POST':
                 data = request.get_json()
 
                 return jsonify(get_interest(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 @app.route('/get-all-interest-sets', methods=['GET', 'POST'])
-def get_interest_set():
+def get_all():
         if request.method == 'POST':
                 data = request.get_json()
 

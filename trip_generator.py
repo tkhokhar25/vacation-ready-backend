@@ -102,6 +102,8 @@ def get_restaurants(interest_set_id):
         for j in range (0, len(cuisines[0][0])):
             request_url = format_restaurant_request_url(cuisines[0][0][j] + " " + meal_times[i] + " restaurants", place_name, price_level - 1, price_level)
             restaurant_data = requests.get(request_url).json()
+            if i == 2:
+                pprint(restaurant_data)
             suggested_restaurants[meal_times[i]] += (filter_restaurants(restaurant_data, cuisines[0][0][j], all_restaurants_set))
 
     return suggested_restaurants

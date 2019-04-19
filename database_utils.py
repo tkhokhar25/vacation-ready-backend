@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from flask import jsonify
 import json
+from pprint import pprint
 
 kDATABASE_NAME = 'dbqvqb417h75ok'
 kUSER = 'syellmnssqszzw'
@@ -106,6 +107,22 @@ def update_in_database(table_name, json_data, entry_id_name, entry_id_value):
     except:
 
         return {"STATUS" : "FAILURE"}
+
+def retrieve_format_all_interest_sets(table_name, user_id, values):
+    return "SELECT {} FROM {} WHERE user_id = {}".format(values, table_name, user_id)
+
+def retrieve_all_interest_sets_from_database(table_name, user_id):
+    connection = get_database_connection()
+    cur = connection.cursor()
+
+    try:
+        cur.execute(retrieve_format_all_interest_sets(table_name, user_id, "*"))
+        
+        return display_data_as_json(cur, cur.fetchall())
+    except:
+
+        return {"STATUS" : "FAILURE"}
+
 
 def retrieve_from_database_without_json(table_name, interest_set_id, value):
     connection = get_database_connection()

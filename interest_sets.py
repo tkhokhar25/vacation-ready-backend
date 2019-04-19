@@ -1,4 +1,4 @@
-from database_utils import insert_into_database, retrieve_from_database, update_in_database
+from database_utils import insert_into_database, retrieve_from_database, update_in_database, retrieve_all_interest_sets_from_database
 from flask import jsonify
 from table_names import *
 
@@ -14,4 +14,4 @@ def update_interest(json_data):
         return update_in_database(kINTEREST_SET_TABLE, json_data, "interest_set_id", interest_set_id)
 
 def get_all_interest_sets(json_data):
-    all_interest_set_ids = retrieve_from_database(kINTEREST_SET_TABLE, json_data["interest_set_id"])
+    return retrieve_all_interest_sets_from_database(kINTEREST_SET_TABLE, json_data["user_id"])
