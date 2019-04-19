@@ -19,6 +19,34 @@ def get_price_level(meal_budget):
     else:
         return 4
 
+def create_json_to_return(list_of_meal_time_dicts, meal_times):
+    suggested_restaurants = {meal_times[0] : [], meal_times[1] : [], meal_times[2] : []}
+
+    for i in range(0, len(list_of_meal_time_dicts)):
+        for key in list_of_meal_time_dicts[i].keys():
+            suggested_restaurants[meal_times[i]].append(list_of_meal_time_dicts[i][key])
+
+    return suggested_restaurants
+
+def evenly_divide_restaurants(list_of_meal_time_dicts, list_of_meal_time_sets_of_unadded_restaurants):
+    for key in list_of_meal_time_sets_of_unadded_restaurants[1]:
+        if key in list_of_meal_time_dicts[0] and len(list_of_meal_time_dicts[0]) > len(list_of_meal_time_dicts[1]):
+            list_of_meal_time_dicts[1][key] = list_of_meal_time_dicts[0][key]
+            del list_of_meal_time_dicts[0][key]
+
+        elif key in list_of_meal_time_dicts[2] and len(list_of_meal_time_dicts[2]) > len(list_of_meal_time_dicts[1]):
+            list_of_meal_time_dicts[1][key] = list_of_meal_time_dicts[2][key]
+            del list_of_meal_time_dicts[2][key]
+    
+    for key in list_of_meal_time_sets_of_unadded_restaurants[2]:
+        if key in list_of_meal_time_dicts[0] and len(list_of_meal_time_dicts[0]) > len(list_of_meal_time_dicts[2]):
+            list_of_meal_time_dicts[2][key] = list_of_meal_time_dicts[0][key]
+            del list_of_meal_time_dicts[0][key]
+
+        elif key in list_of_meal_time_dicts[1] and len(list_of_meal_time_dicts[1]) > len(list_of_meal_time_dicts[2]):
+            list_of_meal_time_dicts[2][key] = list_of_meal_time_dicts[1][key]
+            del list_of_meal_time_dicts[1][key]
+
 def create_json_entry_for_restaurant(restaurant_entry, cuisine):
     restaurant_json_formatted_entry = {}
     restaurant_json_formatted_entry['place_id'] = restaurant_entry['place_id']
@@ -32,17 +60,15 @@ def create_json_entry_for_restaurant(restaurant_entry, cuisine):
     
     return restaurant_json_formatted_entry
 
-def filter_restaurants(restaurant_data, cuisine, all_restaurants_set):
-    resturant_list = []
-
+def filter_restaurants(restaurant_data, cuisine, list_of_meal_time_dicts, curr_dict_index, unadded_restaurants_set):
     for restaurant in restaurant_data['results']:
         resturant_entry = create_json_entry_for_restaurant(restaurant, cuisine)
 
-        if resturant_entry['place_id'] not in all_restaurants_set:
-            resturant_list.append(resturant_entry)
-            all_restaurants_set.add(resturant_entry['place_id'])
-    
-    return resturant_list
+        if resturant_entry['place_id'] in list_of_meal_time_dicts[0] or resturant_entry['place_id'] in list_of_meal_time_dicts[1] or resturant_entry['place_id'] in list_of_meal_time_dicts[2]:
+            if unadded_restaurants_set != None:
+                unadded_restaurants_set.add(resturant_entry['place_id'])
+        else:
+            list_of_meal_time_dicts[curr_dict_index][resturant_entry['place_id']] = resturant_entry
 
 def create_json_entry_for_attraction(attraction_entry):
     attraction_json_formatted_entry = {}
@@ -95,16 +121,22 @@ def get_restaurants(interest_set_id):
     price_level = get_price_level(meal_budget)
 
     meal_times = ["breakfast", "lunch", "dinner"]
-    suggested_restaurants = {meal_times[0] : [], meal_times[1] : [], meal_times[2] : []}
 
-    all_restaurants_set = set()
+    # Each dict maps place_id to json object
+    list_of_meal_time_dicts = [dict(), dict(), dict()]
+
+    # Each dict maps place_id to json object
+    list_of_meal_time_sets_of_unadded_restaurants = [None, set(), set()]
 
     for i in range (0, len(meal_times)):
         for j in range (0, len(cuisines[0][0])):
             request_url = format_restaurant_request_url(cuisines[0][0][j] + " " + meal_times[i] + " restaurants", place_name, price_level - 1, price_level)
             restaurant_data = requests.get(request_url).json()
 
-            suggested_restaurants[meal_times[i]] += (filter_restaurants(restaurant_data, cuisines[0][0][j], all_restaurants_set))
+            filter_restaurants(restaurant_data, cuisines[0][0][j], list_of_meal_time_dicts, i, list_of_meal_time_sets_of_unadded_restaurants[i])
+
+    evenly_divide_restaurants(list_of_meal_time_dicts, list_of_meal_time_sets_of_unadded_restaurants)
+    suggested_restaurants = create_json_to_return(list_of_meal_time_dicts, meal_times)
 
     for i in range (0, len(meal_times)):
         shuffle(suggested_restaurants[meal_times[i]])
