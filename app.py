@@ -74,5 +74,26 @@ def set_trip_set():
 
                 return jsonify(set_trip_info(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
+@app.route('/add-trip', methods=['GET', 'POST'])
+def add_trip():
+        if request.method == 'POST':
+                data = request.get_json()
+
+                return jsonify(create_trip(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
+@app.route('/update-trip', methods=['GET', 'POST'])
+def update_trip():
+        if request.method == 'POST':
+                data = request.get_json()
+
+                return jsonify(modify_trip(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
+@app.route('/delete-trip', methods=['GET', 'POST'])
+def delete_trip():
+        if request.method == 'POST':
+                data = request.get_json()
+
+                return jsonify(remove_trip(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
 if __name__ == "__main__":
         app.run()

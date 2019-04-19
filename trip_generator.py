@@ -1,5 +1,5 @@
 import requests
-from database_utils import retrieve_from_database_without_json
+from database_utils import retrieve_from_database_without_json, insert_into_database
 from pprint import pprint
 from table_names import *
 from random import shuffle
@@ -24,6 +24,8 @@ def create_json_to_return(list_of_meal_time_dicts, meal_times):
 
     for i in range(0, len(list_of_meal_time_dicts)):
         for key in list_of_meal_time_dicts[i].keys():
+            # print(list_of_meal_time_dicts[i][key])
+            # insert_into_database(kPLACE_REVIEWS_TABLE, list_of_meal_time_dicts[i][key], "place_id")
             suggested_restaurants[meal_times[i]].append(list_of_meal_time_dicts[i][key])
 
     return suggested_restaurants
@@ -57,7 +59,7 @@ def create_json_entry_for_restaurant(restaurant_entry, cuisine):
     restaurant_json_formatted_entry['maps_link'] = restaurant_maps_link
     restaurant_json_formatted_entry['lat'] = restaurant_entry['geometry']['location']['lat']
     restaurant_json_formatted_entry['lng'] = restaurant_entry['geometry']['location']['lng']
-    
+
     return restaurant_json_formatted_entry
 
 def filter_restaurants(restaurant_data, cuisine, list_of_meal_time_dicts, curr_dict_index, unadded_restaurants_set):

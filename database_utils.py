@@ -118,7 +118,7 @@ def delete_from_database(table_name, key, value):
     try:
         cur.execute(delete_format(table_name, key, value))
         
-        return {"STATUS" : "FAILURE"}
+        return {"STATUS" : "SUCCESS"}
     except:
 
         return {"STATUS" : "FAILURE"}
