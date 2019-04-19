@@ -32,3 +32,9 @@ def modify_trip(json_data):
     
 def remove_trip(json_data):
     return delete_from_database(KTRIP_TABLE, "trip_id", json_data["trip_id"])
+
+def fetch_trip(json_data):
+    to_update = '(' + str(json_data['trip_id']) + ', ' + str(json_data['day_num']) + ')'
+    to_retrieve = 'place_id, lat, lng, maps_link, name'
+
+    return retrieve_from_database(to_retrieve, KTRIP_TABLE, "(trip_id, day_num)", to_update)
