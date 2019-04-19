@@ -46,6 +46,13 @@ def get_all():
 
                 return jsonify(get_all_interest_sets(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
+@app.route('/delete-interest-set', methods=['GET', 'POST'])
+def delete_interest():
+        if request.method == 'POST':
+                data = request.get_json()
+
+                return jsonify(delete_interest_set(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
 @app.route('/update-interest-set', methods=['GET', 'POST'])
 def update_interest_set():
         if request.method == 'POST':

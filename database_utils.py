@@ -36,11 +36,14 @@ def display_data_as_json(cur, result):
 def insert_format(table_name, keys, values, to_return):
     return "INSERT INTO {} {} VALUES {} RETURNING {}".format(table_name, keys, values, to_return)
 
-def retrieve_format(table_name, interest_set_id, values):
-    return "SELECT {} FROM {} WHERE interest_set_id = {}".format(values, table_name, interest_set_id)
+def retrieve_format(to_select, table_name, key, value):
+    return "SELECT {} FROM {} WHERE {} = {}".format(to_select, table_name, key, value)
 
 def update_format(table_name, keys, values, entry_id_name, entry_id_value):
     return "UPDATE {} SET {} = {} WHERE {} = {}".format(table_name, keys, values, entry_id_name, entry_id_value)
+
+def delete_format(table_name, key, value):
+    return "DELETE FROM {} WHERE {} = {}".format(table_name, key, value)
 
 def get_database_connection():
     connection = psycopg2.connect(dbname = kDATABASE_NAME, user = kUSER, password = kPASSWORD, host = kHOST)
@@ -82,12 +85,12 @@ def insert_into_database(table_name, json_data, to_return):
 
         return {"STATUS" : "FAILURE"}
 
-def retrieve_from_database(table_name, interest_set_id):
+def retrieve_from_database(to_retrieve, table_name, key, value):
     connection = get_database_connection()
     cur = connection.cursor()
 
     try:
-        cur.execute(retrieve_format(table_name, interest_set_id, "*"))
+        cur.execute(retrieve_format(to_retrieve, table_name, key, value))
         
         return display_data_as_json(cur, cur.fetchall())
     except:
@@ -108,21 +111,17 @@ def update_in_database(table_name, json_data, entry_id_name, entry_id_value):
 
         return {"STATUS" : "FAILURE"}
 
-def retrieve_format_all_interest_sets(table_name, user_id, values):
-    return "SELECT {} FROM {} WHERE user_id = {}".format(values, table_name, user_id)
-
-def retrieve_all_interest_sets_from_database(table_name, user_id):
+def delete_from_database(table_name, key, value):
     connection = get_database_connection()
     cur = connection.cursor()
 
     try:
-        cur.execute(retrieve_format_all_interest_sets(table_name, user_id, "*"))
+        cur.execute(delete_format(table_name, key, value))
         
-        return display_data_as_json(cur, cur.fetchall())
+        return {"STATUS" : "FAILURE"}
     except:
 
         return {"STATUS" : "FAILURE"}
-
 
 def retrieve_from_database_without_json(table_name, interest_set_id, value):
     connection = get_database_connection()
