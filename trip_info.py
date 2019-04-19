@@ -37,4 +37,9 @@ def fetch_trip(json_data):
     to_update = '(' + str(json_data['trip_id']) + ', ' + str(json_data['day_num']) + ')'
     to_retrieve = 'place_id, lat, lng, maps_link, name'
 
-    return retrieve_from_database(to_retrieve, KTRIP_TABLE, "(trip_id, day_num)", to_update)
+    to_return = retrieve_from_database(to_retrieve, KTRIP_TABLE, "(trip_id, day_num)", to_update)
+    
+    if 'STATUS' not in to_return:
+        to_return['STATUS'] = 'SUCCESS'
+
+    return to_return
