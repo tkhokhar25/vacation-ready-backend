@@ -42,6 +42,10 @@ def retrieve_format(to_select, table_name, key, value):
 def update_format(table_name, keys, values, entry_id_name, entry_id_value):
     return "UPDATE {} SET {} = {} WHERE {} = {}".format(table_name, keys, values, entry_id_name, entry_id_value)
 
+def upsert_format(table_name, keys, values, conflict, column_to_update):
+    print("INSERT INTO {} {} VALUES {} ON CONFLICT ({}) DO UPDATE SET {} = {}.{} + 1".format(table_name, keys, values, conflict, column_to_update, table_name, column_to_update))
+    return "INSERT INTO {} {} VALUES {} ON CONFLICT ({}) DO UPDATE SET {} = {}.{} + 1".format(table_name, keys, values, conflict, column_to_update, table_name, column_to_update)
+
 def delete_format(table_name, key, value):
     return "DELETE FROM {} WHERE {} = {}".format(table_name, key, value)
 
@@ -134,3 +138,15 @@ def retrieve_from_database_without_json(table_name, interest_set_id, to_retrieve
     except:
 
         return -1
+    
+def upsert_into_database(table_name, keys, values, conflict, column_to_update):
+    connection = get_database_connection()
+    cur = connection.cursor()
+
+    try:
+        cur.execute(upsert_format(table_name, keys, values, conflict, column_to_update))
+        
+        return {"STATUS" : "SUCCESS"}
+    except:
+
+        return {"STATUS" : "FAILURE"}

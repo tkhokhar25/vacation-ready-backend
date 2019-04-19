@@ -3,6 +3,8 @@ from add_user import *
 from interest_sets import *
 from trip_generator import generate_trip
 from trip_info import *
+from place_reviews import *
+
 import os       
 
 app = Flask(__name__)
@@ -94,6 +96,20 @@ def delete_trip():
                 data = request.get_json()
 
                 return jsonify(remove_trip(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
+@app.route('/get-trip', methods=['GET', 'POST'])
+def get_trip():
+        if request.method == 'POST':
+                data = request.get_json()
+
+                return jsonify(fetch_trip(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
+
+@app.route('/review-place', methods=['GET', 'POST'])
+def review():
+        if request.method == 'POST':
+                data = request.get_json()
+
+                return jsonify(review_place(data)), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
 if __name__ == "__main__":
         app.run()

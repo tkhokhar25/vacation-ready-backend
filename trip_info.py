@@ -15,6 +15,13 @@ def parse_json_to_insert(json_data, index):
     insert_format['name'] = json_data['day_details'][index]['name']
     insert_format['place_id'] = json_data['day_details'][index]['place_id']
     
+    try:
+        insert_format['price_level'] = json_data['day_details'][index]['price_level']
+        insert_format['cuisine'] = json_data['day_details'][index]['cuisine']
+    except:
+        insert_format['price_level'] = -1
+        insert_format['cuisine'] = "-1"
+
     return insert_format
 
 def create_trip(json_data):
