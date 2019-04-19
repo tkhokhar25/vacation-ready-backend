@@ -123,12 +123,12 @@ def delete_from_database(table_name, key, value):
 
         return {"STATUS" : "FAILURE"}
 
-def retrieve_from_database_without_json(table_name, interest_set_id, value):
+def retrieve_from_database_without_json(table_name, interest_set_id, to_retrieve):
     connection = get_database_connection()
     cur = connection.cursor()
 
     try:
-        cur.execute(retrieve_format(table_name, interest_set_id, value))
+        cur.execute(retrieve_format(to_retrieve, table_name, "interest_set_id", interest_set_id))
         
         return cur.fetchall()
     except:
