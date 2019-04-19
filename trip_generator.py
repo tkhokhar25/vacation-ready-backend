@@ -2,6 +2,7 @@ import requests
 from database_utils import retrieve_from_database_without_json
 from pprint import pprint
 from table_names import *
+from random import shuffle
 
 kRESTAURANT_QUERY_URL = "https://maps.googleapis.com/maps/api/place/textsearch/json?query={}+in+{}&key={}&minprice={}&maxprice={}"
 kATTRACTION_QUERY_URL = "https://maps.googleapis.com/maps/api/place/textsearch/json?query={}+in+{}&key={}"
@@ -104,6 +105,9 @@ def get_restaurants(interest_set_id):
             restaurant_data = requests.get(request_url).json()
 
             suggested_restaurants[meal_times[i]] += (filter_restaurants(restaurant_data, cuisines[0][0][j], all_restaurants_set))
+
+    for i in range (0, len(meal_times)):
+        shuffle(suggested_restaurants[meal_times[i]])
 
     return suggested_restaurants
 
