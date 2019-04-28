@@ -3,6 +3,7 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from flask import jsonify
 import json
 from pprint import pprint
+from table_names import *
 
 kDATABASE_NAME = 'dbqvqb417h75ok'
 kUSER = 'syellmnssqszzw'
@@ -47,6 +48,9 @@ def upsert_format(table_name, keys, values, conflict, column_to_update):
 
 def delete_format(table_name, key, value):
     return "DELETE FROM {} WHERE {} = {}".format(table_name, key, value)
+
+def fetch_similar_trips_format(place_id):
+    return "SELECT * FROM {} INNER JOIN (SELECT * FROM {} WHERE place_id = '{}') ti ON ti.trip_id = {}.trip_id".format(KTRIP_TABLE, kTRIP_INFO_TABLE, place_id, KTRIP_TABLE)
 
 def get_database_connection():
     connection = psycopg2.connect(dbname = kDATABASE_NAME, user = kUSER, password = kPASSWORD, host = kHOST)
@@ -146,6 +150,18 @@ def upsert_into_database(table_name, keys, values, conflict, column_to_update):
         cur.execute(upsert_format(table_name, keys, values, conflict, column_to_update))
         
         return {"STATUS" : "SUCCESS"}
+    except:
+
+        return {"STATUS" : "FAILURE"}
+
+def fetch_similar_trips(place_id):
+    connection = get_database_connection()
+    cur = connection.cursor()
+
+    try:
+        cur.execute(fetch_similar_trips_format(place_id))
+        
+        return display_data_as_json(cur, cur.fetchall())
     except:
 
         return {"STATUS" : "FAILURE"}
