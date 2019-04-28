@@ -50,7 +50,7 @@ def delete_format(table_name, key, value):
     return "DELETE FROM {} WHERE {} = {}".format(table_name, key, value)
 
 def fetch_similar_trips_format(place_id):
-    return "SELECT * FROM {} INNER JOIN (SELECT * FROM {} WHERE place_id = '{}') ti ON ti.trip_id = {}.trip_id".format(KTRIP_TABLE, kTRIP_INFO_TABLE, place_id, KTRIP_TABLE)
+    return "SELECT DISTINCT * FROM {} INNER JOIN (SELECT * FROM {} WHERE place_id = '{}') ti ON ti.trip_id = {}.trip_id".format(KTRIP_TABLE, kTRIP_INFO_TABLE, place_id, KTRIP_TABLE)
 
 def get_database_connection():
     connection = psycopg2.connect(dbname = kDATABASE_NAME, user = kUSER, password = kPASSWORD, host = kHOST)
